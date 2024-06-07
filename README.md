@@ -9,3 +9,4 @@ For more updates, follow Smart Contract Design Patterns on [Twitter](https://x.c
 ### Articles Backup
 
 1. [Integrating arbitrary ERC-20 tokens](./clwhwksk800000aml4va0dmh1.md)
+2. [Sentinel Pattern](./clx0gvvma000709lifo2egh0r.md)
