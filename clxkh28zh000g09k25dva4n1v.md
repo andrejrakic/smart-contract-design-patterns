@@ -47,16 +47,16 @@ By the way, the correct answer to the quiz question is "Blockchain" :)
 
 # Solution: Commit-Reveal Scheme
 
-> Commit-Reveal Scheme is a two-phase process where participants first commit to a value by submitting a hash, and later reveal the value along with a secret used to generate the hash.
+> Commit-Reveal Scheme is a two-phase process where participants first commit to a value by submitting a hash, and later reveal the value to generate the hash.
 
 To implement it for a quiz example, we would need to add:
 
-* A function to commit a hashed guess
+* A function to commit a guess hashed with the sender
     
-* A function to reveal both the guess and the secret used to generate the previously committed hash
+* A function to reveal the guess used to generate the previously committed hash
     
 
-To keep things fair, it is advisable to split these two processes by forcing some time to pass between the commit and reveal phases. This prevents calling both functions as part of the same transaction (for example, by using a smart contract).
+To keep things fair, it is advisable to split these two processes by forcing some time to pass between the commit and reveal phases. This prevents Bob from calling the commit/reveal function while Alice's reveal is being mined.
 
 ```solidity
 contract Quiz {
@@ -75,9 +75,9 @@ contract Quiz {
         answers[msg.sender] = guess;
     }
 
-    function reveal(string memory answer, bytes32 secret) external {
+    function reveal(string memory answer) external {
         require(guessingEndsTimestamp <= block.timestamp);
-        if(answers[msg.sender] == keccak256(abi.encode(answer, secret))) {
+        if(answers[msg.sender] == keccak256(abi.encode(answer, msg.sender))) {
             if(keccak256(abi.encode(answer)) == hashedAnswer) {
                 // distribute reward
             }
@@ -90,7 +90,7 @@ Now Alice can safely commit her guess without revealing it.
 
 ![](https://cdn.hashnode.com/res/hashnode/image/upload/v1718658713237/b5c36b96-78cd-4c95-9e03-957bd0c0e3e7.png align="center")
 
-Once the committing phase is over, Alice will reveal both her original guess and secret used to generate the previously committed hash. By splitting commit and reveal phases Bob can't "front-run" Alice even though he can now see the actual answer in the mempool.
+Once the committing phase is over, Alice will reveal her original guess used to generate the previously committed hash. By splitting commit and reveal phases Bob can't "front-run" Alice even though he can now see the actual answer in the mempool.
 
 ![](https://cdn.hashnode.com/res/hashnode/image/upload/v1718659756717/41c3da71-46f5-4cac-bc57-18bd6e6627c8.png align="center")
 
